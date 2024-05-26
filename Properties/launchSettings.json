@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "RestoreOverlayIcons": {
+      "commandName": "Project",
+      "commandLineArgs": "Settings.json"
+    }
+  }
+}
