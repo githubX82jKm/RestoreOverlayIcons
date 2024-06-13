@@ -13,30 +13,46 @@ class Program
 	{
 		ILogger logger = Global.LoggerFactory.CreateLogger<Program>();
 
+		int result = 3;
+
 		try
 		{
 			if (args.Length == 0)
 			{
 				logger.LogError("Als Argument 1 Pfad auf die settings.json angeben!");
-				return 1;
+				result = 1;
 			}
-
-			string settingsFilePath = args[0];
-			if (!File.Exists(settingsFilePath))
+			else
 			{
-				logger.LogError("Settings.json wurde hier nicht gefunden: {s}", settingsFilePath);
-				return 2;
+
+				string settingsFilePath = args[0];
+				if (!File.Exists(settingsFilePath))
+				{
+					logger.LogError("Settings.json wurde hier nicht gefunden: {s}", settingsFilePath);
+					result = 2;
+				}
+				else
+				{
+
+					logger.LogInformation("{name} {version}", Assembly.GetEntryAssembly()?.GetName().Name, Assembly.GetEntryAssembly()?.GetName().Version);
+
+					OverlayIconManager olim = new(logger, settingsFilePath);
+
+					olim.Execute();
+
+				}
 			}
 
-			logger.LogInformation("{name} {version}", Assembly.GetEntryAssembly()?.GetName().Name, Assembly.GetEntryAssembly()?.GetName().Version);
+			if (result == 0)
+				logger.LogInformation("Ausführung beendet.");
+			else
+			{
+				logger.LogError("Ausführung fehlerhaft beendet.");
+				Console.ReadKey();
+			}
+		
 
-			OverlayIconManager olim = new(logger, settingsFilePath);
-
-			olim.Execute();
-
-			logger.LogInformation("Ausführung beendet.");
-
-			return 0;
+			return result;
 		}
 		catch (Exception ex)
 		{
