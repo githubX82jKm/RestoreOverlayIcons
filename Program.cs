@@ -13,7 +13,7 @@ class Program
 	{
 		ILogger logger = Global.LoggerFactory.CreateLogger<Program>();
 
-		int result = 3;
+		int result = 0;
 
 		try
 		{
