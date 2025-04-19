@@ -6,7 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Text.Json;
 
-namespace OverlayIcons;
+namespace RestoreOverlayIcons;
 
 public class OverlayIconManager
 {
@@ -18,7 +18,7 @@ public class OverlayIconManager
 
 		logger.LogInformation("Öffne Registry-Schlüssel: {key}", key);
 
-		var shellIconOverlayIdentifiersKey = Registry.LocalMachine.OpenSubKey(key, true) ?? 
+		var shellIconOverlayIdentifiersKey = Registry.LocalMachine.OpenSubKey(key, true) ??
 			throw new Exception($"Registry-Schlüssel konnte nicht geöffnet werden: {key}");
 
 		ShellIconOverlayIdentifiersKey = shellIconOverlayIdentifiersKey;
@@ -26,7 +26,7 @@ public class OverlayIconManager
 		logger.LogInformation("Lese Einstellungen aus Settings.json: {s}", settingsFilePath);
 
 		string json = File.ReadAllText(settingsFilePath);
-		List<string>? keepTheseKeysInFront = JsonSerializer.Deserialize<List<string>>(json) ?? 
+		List<string>? keepTheseKeysInFront = JsonSerializer.Deserialize<List<string>>(json) ??
 			throw new Exception("Settings.json ist leer!");
 
 		KeepTheseKeysInFront = keepTheseKeysInFront;

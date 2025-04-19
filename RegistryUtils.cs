@@ -1,6 +1,6 @@
 ﻿using Microsoft.Win32;
 
-namespace OverlayIcons;
+namespace RestoreOverlayIcons;
 
 public class RegistryUtils
 {

@@ -1,9 +1,8 @@
-﻿using Microsoft.Extensions.Logging;
-using OverlayIcons;
-using RestoreOverlayIcons.Logging;
-using System;
+﻿using System;
 using System.IO;
 using System.Reflection;
+using Microsoft.Extensions.Logging;
+using RestoreOverlayIcons.Logging;
 
 namespace RestoreOverlayIcons;
 
@@ -46,11 +45,7 @@ class Program
 			if (result == 0)
 				logger.LogInformation("Ausführung beendet.");
 			else
-			{
 				logger.LogError("Ausführung fehlerhaft beendet.");
-				Console.ReadKey();
-			}
-		
 
 			return result;
 		}
@@ -58,6 +53,11 @@ class Program
 		{
 			logger.LogError(ex, "Fehler bei der Ausführung");
 			return 1;
+		}
+		finally
+		{
+			Console.WriteLine("--- Taste drücken zum Beenden ---");
+			Console.ReadKey();
 		}
 	}
 }
