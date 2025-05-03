@@ -5,7 +5,7 @@ Problem: Windows supports only up to 15 Overlay Icons in Explorer. Programs as O
 often change order without asking!
 Overlay icons are stored in registry at: HKLM\Software\Microsoft\Windows\CurrentVersion\Explorer\ShellOverlayIdentifiers
 
-Usage: RestoreOverlayIcons.exe <path to settings.json>
+Usage: RestoreOverlayIcons.exe !path to settings.json!
 
 In settings.json, place your favorite Overlay Icons; only names without whitespaces like Tortoise1Normal, Tortoise2Modiefied, ...
 Execution of this program requires administrator rights!
