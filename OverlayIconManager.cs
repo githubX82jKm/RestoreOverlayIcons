@@ -1,10 +1,10 @@
-﻿using Microsoft.Extensions.Logging;
-using Microsoft.Win32;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
+using Microsoft.Extensions.Logging;
+using Microsoft.Win32;
 
 namespace RestoreOverlayIcons;
 
@@ -16,22 +16,22 @@ public class OverlayIconManager
 
 		string key = "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\ShellIconOverlayIdentifiers";
 
-		logger.LogInformation("Öffne Registry-Schlüssel: {key}", key);
+		logger.LogInformation("Opening registry key: {key}", key);
 
 		var shellIconOverlayIdentifiersKey = Registry.LocalMachine.OpenSubKey(key, true) ??
-			throw new Exception($"Registry-Schlüssel konnte nicht geöffnet werden: {key}");
+			throw new Exception($"Could not open registry key: {key}");
 
 		ShellIconOverlayIdentifiersKey = shellIconOverlayIdentifiersKey;
 
-		logger.LogInformation("Lese Einstellungen aus Settings.json: {s}", settingsFilePath);
+		logger.LogInformation("Reading Settings.json: {s}", settingsFilePath);
 
 		string json = File.ReadAllText(settingsFilePath);
 		List<string>? keepTheseKeysInFront = JsonSerializer.Deserialize<List<string>>(json) ??
-			throw new Exception("Settings.json ist leer!");
+			throw new Exception("Settings.json is empty!");
 
 		KeepTheseKeysInFront = keepTheseKeysInFront;
 
-		logger.LogInformation("{count} Schlüssel werden vorne einsortiert:", keepTheseKeysInFront.Count);
+		logger.LogInformation("{count} entries will be sorted at beginning:", keepTheseKeysInFront.Count);
 
 		int i = 0;
 		foreach (string k in KeepTheseKeysInFront)
@@ -47,7 +47,7 @@ public class OverlayIconManager
 
 	RegistryKey ShellIconOverlayIdentifiersKey { get; }
 
-	public Dictionary<string, string>? ReadEntries()
+	private Dictionary<string, string>? ReadEntries()
 	{
 		Dictionary<string, string> entries = [];
 
@@ -67,11 +67,14 @@ public class OverlayIconManager
 	{
 		var entries = ReadEntries();
 		if (entries is not null)
+		{
 			RemoveDuplicateKeys(entries);
+			RenameKeys(entries);
+		}
 	}
 
 	/// <summary>
-	/// Entfernt doppelte Einträge (bezogen auf den Standardwert)
+	/// Entfernt doppelte Einträge (bezogen auf den Standardwert, der in der Form {9AAFF...} vorliegt)
 	/// </summary>
 	/// <param name="entries"></param>
 	void RemoveDuplicateKeys(Dictionary<string, string> entries)
@@ -92,9 +95,16 @@ public class OverlayIconManager
 				entries.Remove(e2.Key);
 				removedKeys.Add(e2.Key);
 			}
-
 		}
+	}
 
+	/// <summary>
+	/// Entfernt aus allen Einträgen führende Leerzeichen und fügt bei den priorisierten
+	/// Einträgen genau ein Leerzeichen am Anfang hinzu (damit diese prioritär behandelt werden)
+	/// </summary>
+	/// <param name="entries"></param>
+	void RenameKeys(Dictionary<string, string> entries)
+	{
 		foreach (var e in entries)
 		{
 			string normalizedKey = e.Key.TrimStart(' ');
@@ -109,13 +119,13 @@ public class OverlayIconManager
 
 	void RemoveKey(string keyName)
 	{
-		Logger.LogInformation("Lösche (doppelten) Schlüssel: {keyName}", keyName);
+		Logger.LogInformation("Removing duplicate Key: {keyName}", keyName);
 		ShellIconOverlayIdentifiersKey.DeleteSubKeyTree(keyName);
 	}
 
 	void RenameKey(string oldKeyName, string newKeyName)
 	{
-		Logger.LogInformation("Benenne Schlüssel um (alt => neu): '{oldKeyName}' => '{newKeyName}'", oldKeyName, newKeyName);
+		Logger.LogInformation("Renaming key (old => new): '{oldKeyName}' => '{newKeyName}'", oldKeyName, newKeyName);
 		RegistryUtils.RenameSubKey(ShellIconOverlayIdentifiersKey, oldKeyName, newKeyName);
 	}
 
